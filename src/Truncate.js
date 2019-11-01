@@ -112,7 +112,18 @@ export default class Truncate extends Component {
     }
 
     onResize() {
-        this.calcTargetWidth();
+        const {
+            elements: {
+                text
+            }
+        } = this;
+
+        this.calcTargetWidth(() => {
+            // Node not needed in document tree to read its content
+            if (text) {
+                text.parentNode.removeChild(text);
+            }
+        });
     }
 
     onTruncate(didTruncate) {
