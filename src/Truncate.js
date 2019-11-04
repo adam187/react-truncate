@@ -41,22 +41,13 @@ export default class Truncate extends Component {
 
     componentDidMount() {
         const {
-            elements: {
-                text
-            },
-            calcTargetWidth,
             onResize
         } = this;
 
         const canvas = document.createElement('canvas');
         this.canvasContext = canvas.getContext('2d');
 
-        calcTargetWidth(() => {
-            // Node not needed in document tree to read its content
-            if (text) {
-                text.parentNode.removeChild(text);
-            }
-        });
+        this.recalculate();
 
         this.resizeOptions = arePassiveEventsSupported() ? { passive: true } : undefined;
         window.addEventListener('resize', onResize, this.resizeOptions);
@@ -70,7 +61,7 @@ export default class Truncate extends Component {
 
         // If the width prop has changed, recalculate size of contents
         if (this.props.width !== prevProps.width) {
-            this.calcTargetWidth();
+            this.recalculate();
         }
     }
 
@@ -112,18 +103,7 @@ export default class Truncate extends Component {
     }
 
     onResize() {
-        const {
-            elements: {
-                text
-            }
-        } = this;
-
-        this.calcTargetWidth(() => {
-            // Node not needed in document tree to read its content
-            if (text) {
-                text.parentNode.removeChild(text);
-            }
-        });
+        this.recalculate();
     }
 
     onTruncate(didTruncate) {
@@ -181,6 +161,21 @@ export default class Truncate extends Component {
         this.setState({
             targetWidth
         }, callback);
+    }
+
+    recalculate () {
+        const {
+            elements: {
+                text
+            }
+        } = this;
+
+        this.calcTargetWidth(() => {
+            // Node not needed in document tree to read its content
+            if (text && text.parentNode) {
+                text.parentNode.removeChild(text);
+            }
+        });
     }
 
     measureWidth(text) {
